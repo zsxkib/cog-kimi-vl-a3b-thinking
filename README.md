@@ -1,7 +1,6 @@
 # Cog Kimi-VL-A3B-Thinking
 
 [![Replicate](https://replicate.com/zsxkib/kimi-vl-a3b-thinking/badge)](https://replicate.com/zsxkib/kimi-vl-a3b-thinking)
-[![Cog](https://github.com/replicate/cog/raw/main/docs/header.png)](https://github.com/replicate/cog)
 
 This repository provides a [Cog](https://github.com/replicate/cog) interface for the `moonshotai/Kimi-VL-A3B-Thinking` multimodal model.
 
