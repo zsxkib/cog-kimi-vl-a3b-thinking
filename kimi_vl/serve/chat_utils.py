@@ -8,8 +8,8 @@ import copy
 from enum import IntEnum, auto
 from typing import Dict, List
 import base64
+import os
 
-import gradio as gr
 import torch
 
 from .utils import pil_to_base64
@@ -305,17 +305,18 @@ def generate_prompt_with_history(text, images, history, processor, max_length=20
             return conversation_copy
 
         if len(conversation.messages) % 2 != 0:
-            gr.Error("The messages between user and assistant are not paired.")
-            return
+            logger.error("The messages between user and assistant are not paired.")
+            raise ValueError("The messages between user and assistant are not paired.")
 
         try:
             for _ in range(2):  # pop out two messages in a row
                 conversation.messages.pop(0)
         except IndexError:
-            gr.Error("Input text processing failed, unable to respond in this round.")
-            return None
+            logger.error("Input text processing failed, unable to respond in this round.")
+            raise ValueError("Input text processing failed, unable to respond in this round.")
 
-    gr.Error("Prompt could not be generated within max_length limit.")
+    logger.error("Prompt could not be generated within max_length limit.")
+    raise ValueError("Prompt could not be generated within max_length limit.")
     return None
 
 
@@ -353,13 +354,18 @@ def to_gradio_chatbot(conversation: Conversation) -> list:
                     img_str = ""
                     for j, image in enumerate(images):
                         if isinstance(image, str):
-                            with open(image, "rb") as f:
-                                data = f.read()
-                            img_b64_str = base64.b64encode(data).decode()
-                            image_str = (
-                                f'<img src="data:image/png;base64,{img_b64_str}" '
-                                f'alt="user upload image" style="max-width: 300px; height: auto;" />'
-                            )
+                            # Check if file exists before opening
+                            if os.path.exists(image):
+                                with open(image, "rb") as f:
+                                    data = f.read()
+                                img_b64_str = base64.b64encode(data).decode()
+                                image_str = (
+                                    f'<img src="data:image/png;base64,{img_b64_str}" '
+                                    f'alt="user upload image" style="max-width: 300px; height: auto;" />'
+                                )
+                            else:
+                                logger.warning(f"Image file not found: {image}")
+                                image_str = f"[Image file not found: {image}]"
                         else:
                             image_str = pil_to_base64(image, f"user upload image_{j}", max_size=800, min_size=400)
 

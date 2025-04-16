@@ -24,11 +24,11 @@ BOX2COLOR = {
 }
 MAX_IMAGE_SIZE = 1024
 MIN_IMAGE_SIZE = 1024
-logger = logging.getLogger("gradio_logger")
+logger = logging.getLogger(__name__)
 
 
 def configure_logger(log_dir: str = "logs"):
-    logger = logging.getLogger("gradio_logger")
+    logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
     timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -284,6 +284,9 @@ def parse_ref_bbox(response, image: Image.Image):
             font = ImageFont.truetype("kimi_vl/serve/assets/simsun.ttc", size=20)
             draw.text((text_x, text_y), label, font=font, fill=text_color)
 
+        return image
+    except FileNotFoundError:
+        logger.error(f"Font file not found at kimi_vl/serve/assets/simsun.ttc. Cannot draw labels.")
         return image
     except Exception as e:
         logger.error(f"Error parsing reference bounding boxes: {e}")

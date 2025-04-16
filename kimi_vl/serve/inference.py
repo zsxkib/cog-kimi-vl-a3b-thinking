@@ -4,7 +4,6 @@ from threading import Thread
 from typing import List, Optional
 
 import torch
-import spaces
 from transformers import (
     AutoModelForCausalLM,
     AutoProcessor,
@@ -114,14 +113,20 @@ def preprocess(
                 )
             results.append(record)
         elif message["role"] == converstion.roles[1] or message["role"] == "assistant":
-            formatted_answer = message["content"].strip()
-            # ◁think▷用户说了“你好”，这是一个非常简单的问候，通常用于开启对话。我需要判断用户的意图。可能性一：用户只是礼貌性地打招呼，想要开启一段对话；可能性二：用户可能有更具体的需求，比如询问我的功能、功能或者需要帮助。由于用户没有提供更多信息，我需要保持开放，同时引导用户进一步说明他们的需求。
-            # 我的回复需要既友好又开放，不能显得过于正式或冷漠。同时，我需要避免假设用户的具体需求，而是提供一个轻松的、鼓励继续对话的回应。◁/think▷你好！很高兴见到你。有什么我可以帮助你的吗
-            # delete all the texts between ◁think▷ and ◁/think▷
-            # FIXME: this is a hack to remove the thinking texts
-            # formatted_answer = re.sub(r"◁think▷.*◁/think▷", "", formatted_answer)
-            think_end_token = '◁/think▷'
-            formatted_answer = formatted_answer.split(think_end_token)[-1]
+            # Handle the case where the last assistant message content is None (placeholder)
+            if message["content"] is None and mid == len(latest_messages) - 1:
+                continue # Skip adding this placeholder to results for apply_chat_template
+            elif message["content"] is None:
+                # This shouldn't happen for non-final assistant messages
+                logger.warning(f"Assistant message content is None at index {mid}, but it's not the last message. Using empty string.")
+                formatted_answer = ""
+            else:
+                formatted_answer = message["content"].strip()
+                # FIXME: this is a hack to remove the thinking texts
+                # formatted_answer = re.sub(r"◁think▷.*◁/think▷", "", formatted_answer)
+                think_end_token = '◁/think▷'
+                formatted_answer = formatted_answer.split(think_end_token)[-1]
+
             results.append(
                 {
                     "role": message["role"],
