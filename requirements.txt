@@ -1,16 +1,14 @@
-torchvision==0.20.0
-transformers==4.51.1
+torch>=2.5.0
+torchvision>=0.20.0
+transformers>=4.51.1
 accelerate
 sentencepiece
 attrdict
 einops
 tiktoken
 blobfile
-https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.5cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+Pillow
 
-# for gradio demo
-gradio
-gradio-client
 mdtex2html
 pypinyin
 tqdm
