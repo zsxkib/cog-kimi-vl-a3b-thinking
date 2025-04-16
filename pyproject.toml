@@ -1,0 +1,29 @@
+[project]
+name = "kimi_vl"
+version = "1.0.0"
+description = "Kimi-VL"
+license = {file = "LICENSE-CODE"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "torch==2.5.0",
+    "transformers==4.50.0",
+    "accelerate",
+    "tiktoken",
+    "blobfile",
+    "sentencepiece",
+]
+
+[project.optional-dependencies]
+gradio = [
+    "gradio==3.48.0",
+    "gradio-client==0.6.1",
+    "mdtex2html==1.3.0",
+    "pypinyin==0.50.0",
+]
+
+# Linter tools:
+[tool.black]
+line-length = 120
+skip-string-normalization = true
+target-version = ["py310"]
