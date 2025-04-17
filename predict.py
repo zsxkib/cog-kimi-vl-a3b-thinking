@@ -110,16 +110,22 @@ class Predictor(BasePredictor):
 
         conv = self.conv_template.copy()
 
-        user_message = prompt
+        user_input = prompt
         if pil_image:
-            user_message = IMAGE_TOKEN + '\n' + prompt
-            print("Image token added to prompt.")
+            # Structure message as tuple (text, [image]) if image exists
+            # Prepend IMAGE_TOKEN for model processing
+            user_input = (IMAGE_TOKEN + '\n' + prompt, [pil_image])
+            print("Image token added to prompt and image object included.")
+        else:
+            # Keep as string if no image
+             user_input = prompt
 
 
-        conv.append_message(conv.roles[0], user_message) 
-        conv.append_message(conv.roles[1], None)       
+        conv.append_message(conv.roles[0], user_input) # Pass the tuple or string
+        conv.append_message(conv.roles[1], None)
 
         print("Processing conversation and image (if any)...")
+        # convert_conversation_to_prompts handles the tuple correctly
         all_conv, last_image = convert_conversation_to_prompts(conv)
 
         stop_words = conv.stop_str
@@ -152,23 +158,3 @@ class Predictor(BasePredictor):
         print(
             f"Finished prediction. Params: temp={temperature}, top_p={top_p}, max_len={max_length_tokens}"
         )
-
-# Example usage (for local testing if needed, Cog doesn't use this)
-# if __name__ == "__main__":
-#     predictor = Predictor()
-#     predictor.setup()
-#     prompt = "Describe this image."
-#     # Provide path to a local image for testing
-#     image_path = "path/to/your/test_image.jpg"
-#     if os.path.exists(image_path):
-#         image_input = Path(image_path)
-#     else:
-#         image_input = None
-#         prompt = "Hello, who are you?" # Test text-only
-#
-#     print(f"--- Running prediction with prompt: '{prompt}' ---")
-#     output = predictor.predict(prompt=prompt, image=image_input)
-#     for chunk in output:
-#         print(chunk, end="", flush=True)
-#     print("--- Prediction finished ---")
-

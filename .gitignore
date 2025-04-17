@@ -175,3 +175,4 @@ cython_debug/
 
 # Cog / Local Model Cache
 /model_cache/*
+.cog/
